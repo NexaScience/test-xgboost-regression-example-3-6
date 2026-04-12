@@ -1,0 +1,5 @@
+xgboost>=1.5
+scikit-learn>=1.0
+numpy
+pandas
+joblib
