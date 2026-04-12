@@ -10,29 +10,14 @@ pip install -r requirements.txt
 
 ## Scripts
 
-### train.py
-
-Train an XGBoost regressor and evaluate on a held-out test set.
-
-```bash
-python train.py
-python train.py --n-estimators 200 --max-depth 4 --learning-rate 0.05
-```
-
-### train_with_cv.py
-
-Train with cross-validation using XGBoost's built-in `xgb.cv()`.
+| Script | Description |
+|---|---|
+| `train.py` | Train/evaluate with train-test split. Prints RMSE and R2. |
+| `train_with_cv.py` | Cross-validation via `xgb.cv()`. Prints best RMSE. |
+| `feature_importance.py` | Train and print top 5 features by importance. |
 
 ```bash
-python train_with_cv.py
-python train_with_cv.py --nfold 10 --n-estimators 300
-```
-
-### feature_importance.py
-
-Train a model and display feature importance scores.
-
-```bash
-python feature_importance.py
-python feature_importance.py --n-estimators 200 --max-depth 4
+python train.py                   # default seed=42
+python train_with_cv.py --nfold 10
+python feature_importance.py --seed 123
 ```

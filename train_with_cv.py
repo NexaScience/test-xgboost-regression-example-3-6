@@ -1,4 +1,4 @@
-"""Train an XGBoost regressor with built-in cross-validation."""
+"""Train an XGBoost regressor with cross-validation."""
 
 import argparse
 
@@ -6,61 +6,31 @@ import xgboost as xgb
 from sklearn.datasets import fetch_california_housing
 
 
-def parse_args():
-    parser = argparse.ArgumentParser(
-        description="Train XGBoost with cross-validation on California Housing data."
-    )
-    parser.add_argument(
-        "--n-estimators", type=int, default=200, help="Maximum number of boosting rounds."
-    )
-    parser.add_argument(
-        "--max-depth", type=int, default=6, help="Maximum tree depth."
-    )
-    parser.add_argument(
-        "--learning-rate", type=float, default=0.1, help="Boosting learning rate."
-    )
-    parser.add_argument(
-        "--nfold", type=int, default=5, help="Number of CV folds."
-    )
-    parser.add_argument(
-        "--seed", type=int, default=42, help="Random seed."
-    )
-    return parser.parse_args()
-
-
 def main():
-    args = parse_args()
+    parser = argparse.ArgumentParser(description="XGBoost CV on California Housing.")
+    parser.add_argument("--seed", type=int, default=42, help="Random seed.")
+    parser.add_argument("--nfold", type=int, default=5, help="Number of CV folds.")
+    args = parser.parse_args()
 
-    # Load dataset
     data = fetch_california_housing()
-    dtrain = xgb.DMatrix(data.data, label=data.target, feature_names=list(data.feature_names))
+    dtrain = xgb.DMatrix(data.data, label=data.target)
 
     params = {
-        "max_depth": args.max_depth,
-        "learning_rate": args.learning_rate,
+        "max_depth": 6,
         "objective": "reg:squarederror",
         "seed": args.seed,
     }
 
-    # Cross-validation
     cv_results = xgb.cv(
-        params,
-        dtrain,
-        num_boost_round=args.n_estimators,
+        params, dtrain,
+        num_boost_round=100,
         nfold=args.nfold,
         seed=args.seed,
-        metrics=["rmse", "mae"],
-        early_stopping_rounds=20,
-        verbose_eval=True,
+        metrics="rmse",
     )
 
-    best_idx = cv_results["test-rmse-mean"].idxmin()
-    best_rmse = cv_results.loc[best_idx, "test-rmse-mean"]
-    best_mae = cv_results.loc[best_idx, "test-mae-mean"]
-
-    print(f"\nBest iteration: {best_idx}")
-    print(f"  RMSE: {best_rmse:.4f}")
-    print(f"  MAE:  {best_mae:.4f}")
+    best_rmse = cv_results["test-rmse-mean"].min()
+    print(f"Best RMSE: {best_rmse:.4f}")
 
 
 if __name__ == "__main__":
