@@ -51,8 +51,9 @@ def main():
                            verbose_eval=10)
         train_time = time.time() - start_time
         print(f"\n[TRAIN] CV completed in {train_time:.2f}s")
-        best_rmse = cv_results["test-rmse-mean"].min()
-        best_round = cv_results["test-rmse-mean"].idxmin()
+        rmse_values = cv_results["test-rmse-mean"]
+        best_rmse = min(rmse_values)
+        best_round = rmse_values.index(best_rmse) if isinstance(rmse_values, list) else rmse_values.idxmin()
         print(f"[RESULT] Best RMSE: {best_rmse:.4f} at round {best_round}")
     except Exception as e:
         print(f"[ERROR] CV failed: {e}")
